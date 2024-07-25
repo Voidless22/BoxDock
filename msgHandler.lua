@@ -63,6 +63,9 @@ function msgHandler.driverMessageHandler(message)
         elseif dataType == 'Target Buff' then
             charData.Target.Buffs[subIndex] = newData
             printf('Target Buff Update(Slot: %i): %s', subIndex, mq.TLO.Spell(newData).Name())
+        elseif dataType == 'Buff' then
+            charData.Buffs[subIndex] = newData
+            printf('Buff Update:(Slot: %i): %s', subIndex, mq.TLO.Spell(newData).Name())
         end
     end
 end

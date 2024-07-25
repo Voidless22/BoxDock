@@ -21,9 +21,9 @@ local function split(inputstr, sep)
 end
 
 function data.Refresh(currentData, prevData)
-return currentData ~= prevData
+    
+    return currentData ~= prevData
 end
-
 
 function data.GetData(name)
     if name then
@@ -43,14 +43,18 @@ function data.InitializeData()
     -- Target
     dataTable.Target = { Id = mq.TLO.Target.ID(), Buffs = {} }
     if dataTable.Target.Id ~= nil then
-        for i = 0, (mq.TLO.Target.BuffCount() or 0) do
+        for i = 1, (mq.TLO.Target.BuffCount() or 1) do
             dataTable.Target.Buffs[i] = mq.TLO.Target.Buff(i).ID() or 0
         end
     end
     -- Spellbar
     dataTable.Spellbar = {}
-    for i=1, mq.TLO.Me.NumGems() do
+    for i = 1, mq.TLO.Me.NumGems() do
         dataTable.Spellbar[i] = mq.TLO.Me.Gem(i).ID()
+    end
+    dataTable.Buffs = {}
+    for i = 1, (mq.TLO.Me.BuffCount() or 1) do
+        dataTable.Buffs[i] = mq.TLO.Me.Buff(i).ID() or 0
     end
 
     isDataInitialized = true

@@ -41,8 +41,8 @@ local function RefreshData()
     end
     -- Target Buffs
     for i = 1, (mq.TLO.Target.BuffCount() or 1) do
-        if data.Refresh(mq.TLO.Target.Buff(i).ID(), dataTable.Target.Buffs[i]) then
-            dataTable.Target.Buffs[i] = mq.TLO.Target.Buff(i).ID()
+        if data.Refresh(mq.TLO.Target.Buff(i).Spell.ID(), dataTable.Target.Buffs[i]) then
+            dataTable.Target.Buffs[i] = mq.TLO.Target.Buff(i).Spell.ID()
             utils.boxActor:send(msgHandler.driverAddress,
                 {
                     id = 'Data-Refresh',
@@ -57,16 +57,25 @@ local function RefreshData()
     -- Spellbar
     for i = 1, mq.TLO.Me.NumGems() do
         if data.Refresh((mq.TLO.Me.Gem(i).ID() or 0), dataTable.Spellbar[i]) then
-            dataTable.Spellbar[i] = mq.TLO.Me.Gem(i).ID()
+            dataTable.Spellbar[i] = mq.TLO.Me.Gem(i).ID() or 0
             print('Sending spellbar update')
             utils.boxActor:send(msgHandler.driverAddress,
                 {
                     id = 'Data-Refresh',
                     dataType = 'Spellbar',
-                    newData = mq.TLO.Me.Gem(i).ID(),
+                    newData = mq.TLO.Me.Gem(i).ID() or 0,
                     boxName = boxName,
                     subIndex = i
                 })
+        end
+    end
+    -- Buffs
+    for i = 1, (mq.TLO.Me.BuffCount() or 1) do
+        if data.Refresh(mq.TLO.Me.Buff(i).Spell.ID(), dataTable.Buffs[i]) then
+            dataTable.Buffs[i] = mq.TLO.Me.Buff(i).Spell.ID()
+            utils.boxActor:send(msgHandler.driverAddress,
+                { id = 'Data-Refresh', dataType = 'Buff', subIndex = i, newData = mq.TLO.Me.Buff(i).Spell.ID(), boxName =
+                boxName })
         end
     end
 end
