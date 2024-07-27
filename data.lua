@@ -45,7 +45,6 @@ function data.InitializeData()
     data.CreateEntry(mq.TLO.Me.Name())
     local dataTable = data.charData[mq.TLO.Me.Name()]
     -- stat init
-    dataTable.Name = mq.TLO.Me.Name()
     dataTable.Stats = { HP = mq.TLO.Me.PctHPs(), Mana = mq.TLO.Me.PctMana(), End = mq.TLO.Me.PctEndurance() }
     dataTable.Info = { Name = mq.TLO.Me.Name(), Class = mq.TLO.Me.Class(), Race = mq.TLO.Me.Race() }
     -- Target
@@ -64,7 +63,7 @@ function data.InitializeData()
     -- Buffs
     dataTable.Buffs = {}
     for i = 1, (mq.TLO.Me.BuffCount() or 1) do
-        dataTable.Buffs[i] = mq.TLO.Me.Buff(i).ID() or 0
+        dataTable.Buffs[i] = mq.TLO.Me.Buff(i).Spell.ID() or 0
     end
     
     dataTable.Sitting = mq.TLO.Me.Sitting()

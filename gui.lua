@@ -59,8 +59,14 @@ local BDTex = mq.CreateTexture(BDTexFile)
 local function DrawDock(charName)
     local charData = data.charData[charName]
     ImGui.SetWindowSize(ImVec2(gui.Layout[charName].Window.Size.w, gui.Layout[charName].Window.Size.h))
+    if charData.Info ~= nil then
+        dockModules.Info(gui.Layout[charName], charData)
+    end
     if charData.Stats ~= nil then
         dockModules.Stats(gui.Layout[charName], charData)
+    end
+    if charData.Buffs ~= nil then
+        dockModules.Buffs(gui.Layout[charName], charData)
     end
 end
 
