@@ -40,18 +40,20 @@ local function RefreshData()
         end
     end
     -- Target Buffs
-    for i = 1, (mq.TLO.Target.BuffCount() or 1) do
-        if data.Refresh(mq.TLO.Target.Buff(i).Spell.ID(), dataTable.Target.Buffs[i]) then
-            dataTable.Target.Buffs[i] = mq.TLO.Target.Buff(i).Spell.ID()
-            utils.boxActor:send(msgHandler.driverAddress,
-                {
-                    id = 'Data-Refresh',
-                    dataType = 'Target Buff',
-                    subIndex = i,
-                    newData = mq.TLO.Target.Buff(i).ID(),
-                    boxName =
-                        boxName
-                })
+    if dataTable.Target.Id ~= (0 or nil) and dataTable.Target.Buffs ~= nil then
+        for i = 0, (mq.TLO.Target.BuffCount() or 0) do
+            if data.Refresh(mq.TLO.Target.Buff(i).Spell.ID(), dataTable.Target.Buffs[i]) then
+                dataTable.Target.Buffs[i] = mq.TLO.Target.Buff(i).Spell.ID()
+                utils.boxActor:send(msgHandler.driverAddress,
+                    {
+                        id = 'Data-Refresh',
+                        dataType = 'Target Buff',
+                        subIndex = i,
+                        newData = mq.TLO.Target.Buff(i).ID(),
+                        boxName =
+                            boxName
+                    })
+            end
         end
     end
     -- Spellbar
@@ -70,17 +72,39 @@ local function RefreshData()
         end
     end
     -- Buffs
-    for i = 1, (mq.TLO.Me.BuffCount() or 1) do
+    for i = 0, (mq.TLO.Me.BuffCount() or 0) do
         if data.Refresh(mq.TLO.Me.Buff(i).Spell.ID(), dataTable.Buffs[i]) then
             dataTable.Buffs[i] = mq.TLO.Me.Buff(i).Spell.ID()
+            mq.delay(25)
             utils.boxActor:send(msgHandler.driverAddress,
-                { id = 'Data-Refresh', dataType = 'Buff', subIndex = i, newData = mq.TLO.Me.Buff(i).Spell.ID(), boxName =
-                boxName })
+                {
+                    id = 'Data-Refresh',
+                    dataType = 'Buff',
+                    subIndex = i,
+                    newData = mq.TLO.Me.Buff(i).Spell.ID(),
+                    boxName =
+                        boxName
+                })
         end
     end
 end
 
 
+local function Connect()
+    while not msgHandler.CheckConnected() do
+        print('Searching for a driver....')
+        utils.boxActor:send(msgHandler.driverAddress, { id = 'Driver-Search', boxName = boxName })
+        mq.delay('1s')
+    end
+    
+    if msgHandler.CheckConnected() then
+        data.InitializeData()
+        mq.delay('30s', data.isDataInitialized)
+        utils.boxActor:send(msgHandler.driverAddress,
+            { id = 'Data-Init', boxName = boxName, data = data.GetData(mq.TLO.Me.Name()) })
+        print('Sending data initialization to driver.')
+    end
+end
 
 
 
@@ -94,19 +118,7 @@ end
 
 
 
-while not msgHandler.CheckConnected() do
-    print('Searching for a driver....')
-    utils.boxActor:send(msgHandler.driverAddress, { id = 'Driver-Search', boxName = boxName })
-    mq.delay('1s')
-end
-
-if msgHandler.CheckConnected() then
-    data.InitializeData()
-    mq.delay('30s', data.isDataInitialized)
-    utils.boxActor:send(msgHandler.driverAddress,
-        { id = 'Data-Init', boxName = boxName, data = data.GetData(mq.TLO.Me.Name()) })
-    print('Sending data initialization to driver.')
-end
+Connect()
 
 
 main()

@@ -8,6 +8,14 @@ function data.CreateEntry(charName)
     printf('Data Table Entry Created for %s', charName)
 end
 
+local function returnIsCasting()
+    if mq.TLO.Me.Casting() then
+        return true
+    else
+        return false
+    end
+end
+
 -- util that I can't put in utils because for some dumb reason my actors are stored there and require loops go brrr
 local function split(inputstr, sep)
     if sep == nil then
@@ -21,7 +29,6 @@ local function split(inputstr, sep)
 end
 
 function data.Refresh(currentData, prevData)
-    
     return currentData ~= prevData
 end
 
@@ -38,13 +45,15 @@ function data.InitializeData()
     data.CreateEntry(mq.TLO.Me.Name())
     local dataTable = data.charData[mq.TLO.Me.Name()]
     -- stat init
+    dataTable.Name = mq.TLO.Me.Name()
     dataTable.Stats = { HP = mq.TLO.Me.PctHPs(), Mana = mq.TLO.Me.PctMana(), End = mq.TLO.Me.PctEndurance() }
     dataTable.Info = { Name = mq.TLO.Me.Name(), Class = mq.TLO.Me.Class(), Race = mq.TLO.Me.Race() }
     -- Target
     dataTable.Target = { Id = mq.TLO.Target.ID(), Buffs = {} }
-    if dataTable.Target.Id ~= nil then
-        for i = 1, (mq.TLO.Target.BuffCount() or 1) do
-            dataTable.Target.Buffs[i] = mq.TLO.Target.Buff(i).ID() or 0
+    dataTable.Target.Buffs = {}
+    if dataTable.Target.Id ~= (nil or 0) then
+        for i = 0, (mq.TLO.Target.BuffCount() or 0) do
+            dataTable.Target.Buffs[i] = (mq.TLO.Target.Buff(i).ID() or 0)
         end
     end
     -- Spellbar
@@ -52,10 +61,14 @@ function data.InitializeData()
     for i = 1, mq.TLO.Me.NumGems() do
         dataTable.Spellbar[i] = mq.TLO.Me.Gem(i).ID()
     end
+    -- Buffs
     dataTable.Buffs = {}
     for i = 1, (mq.TLO.Me.BuffCount() or 1) do
         dataTable.Buffs[i] = mq.TLO.Me.Buff(i).ID() or 0
     end
+    
+    dataTable.Sitting = mq.TLO.Me.Sitting()
+    dataTable.isCasting = returnIsCasting()
 
     isDataInitialized = true
 end
@@ -69,16 +82,8 @@ end
 function data.InitCharDataEntry(name, charData)
     if data.charData[name] == nil then
         data.CreateEntry(name)
-    else
-        data.charData[name] = charData
-        printf('%s HP: %i', name, data.charData[name].Stats.HP)
-        if data.charData[name].Target.Id then
-            for index, value in ipairs(data.charData[name].Target.Buffs) do
-                printf('Target %s: Buff: %s', mq.TLO.Spawn(data.charData[name].Target.Id).Name(),
-                    mq.TLO.Spell(value).Name())
-            end
-        end
     end
+    data.charData[name] = charData
 end
 
 return data

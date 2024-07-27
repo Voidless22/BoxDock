@@ -1,6 +1,7 @@
 local mq                 = require('mq')
 local data               = require('data')
 local gui                = require('gui')
+local defaultLayout = require('defaultLayout')
 local msgHandler         = {}
 msgHandler.connected     = false
 msgHandler.boxAddress    = { mailbox = 'Box', script = 'boxdock/box' }
@@ -55,12 +56,15 @@ function msgHandler.driverMessageHandler(message)
             charData.Target.Id = newData
             printf('Target Update: %s', mq.TLO.Spawn(newData).Name())
             if charData.Target.Id == 0 then
-                for i = 1, #charData.Target.Buffs do
-                    charData.Target.Buffs[i] = 0
-                    printf('No Target, Clearing Buff Slot %i', i)
+                if charData.Target.Buffs then
+                    for i = 1, #charData.Target.Buffs do
+                        charData.Target.Buffs[i] = 0
+                        printf('No Target, Clearing Buff Slot %i', i)
+                    end
                 end
             end
         elseif dataType == 'Target Buff' then
+            if charData.Target.Buffs == nil then charData.Target.Buffs = {} end
             charData.Target.Buffs[subIndex] = newData
             printf('Target Buff Update(Slot: %i): %s', subIndex, mq.TLO.Spell(newData).Name())
         elseif dataType == 'Buff' then
