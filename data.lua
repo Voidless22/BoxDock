@@ -16,17 +16,7 @@ local function returnIsCasting()
     end
 end
 
--- util that I can't put in utils because for some dumb reason my actors are stored there and require loops go brrr
-local function split(inputstr, sep)
-    if sep == nil then
-        sep = "%s"
-    end
-    local t = {}
-    for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
-        table.insert(t, str)
-    end
-    return t
-end
+
 
 function data.Refresh(currentData, prevData)
     return currentData ~= prevData
@@ -54,7 +44,9 @@ function data.InitializeData()
         for i = 0, (mq.TLO.Target.BuffCount() or 0) do
             dataTable.Target.Buffs[i] = (mq.TLO.Target.Buff(i).ID() or 0)
         end
+
     end
+    dataTable.Target.ConColor = mq.TLO.Target.ConColor() or 0
     -- Spellbar
     dataTable.Spellbar = {}
     for i = 1, mq.TLO.Me.NumGems() do

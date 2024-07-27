@@ -68,6 +68,12 @@ local function DrawDock(charName)
     if charData.Buffs ~= nil then
         dockModules.Buffs(gui.Layout[charName], charData)
     end
+    if charData.Spellbar ~= nil then
+        dockModules.Spellbar(gui.Layout[charName], charData)
+    end
+    if charData.Target ~= nil then
+        dockModules.Target(gui.Layout[charName], charData)
+    end
 end
 
 local function DrawBDButton()

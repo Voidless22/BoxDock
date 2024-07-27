@@ -39,6 +39,11 @@ local function RefreshData()
             end
         end
     end
+    if data.Refresh(mq.TLO.Target.ConColor, dataTable.Target.ConColor) then
+        dataTable.Target.ConColor = mq.TLO.Target.ConColor() or 0 
+        utils.boxActor:send(msgHandler.driverAddress,
+        { id = 'Data-Refresh', dataType = 'Target-ConColor', newData =   dataTable.Target.ConColor, boxName = boxName })
+    end
     -- Target Buffs
     if dataTable.Target.Id ~= (0 or nil) and dataTable.Target.Buffs ~= nil then
         for i = 0, (mq.TLO.Target.BuffCount() or 0) do
@@ -75,7 +80,7 @@ local function RefreshData()
     for i = 0, (mq.TLO.Me.BuffCount() or 0) do
         if data.Refresh(mq.TLO.Me.Buff(i).Spell.ID(), dataTable.Buffs[i]) then
             dataTable.Buffs[i] = mq.TLO.Me.Buff(i).Spell.ID()
-            mq.delay(25)
+            mq.delay(10)
             utils.boxActor:send(msgHandler.driverAddress,
                 {
                     id = 'Data-Refresh',
@@ -96,7 +101,7 @@ local function Connect()
         utils.boxActor:send(msgHandler.driverAddress, { id = 'Driver-Search', boxName = boxName })
         mq.delay('1s')
     end
-    
+
     if msgHandler.CheckConnected() then
         data.InitializeData()
         mq.delay('30s', data.isDataInitialized)

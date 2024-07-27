@@ -68,8 +68,13 @@ function msgHandler.driverMessageHandler(message)
             charData.Target.Buffs[subIndex] = newData
             printf('Target Buff Update(Slot: %i): %s', subIndex, mq.TLO.Spell(newData).Name())
         elseif dataType == 'Buff' then
+            if charData.Buffs == nil then charData.Buffs = {} end
             charData.Buffs[subIndex] = newData
             printf('Buff Update:(Slot: %i): %s', subIndex, mq.TLO.Spell(newData).Name())
+        elseif dataType == 'Target-ConColor' then
+            if charData.Target.Id ~= 0 then
+                charData.Target.ConColor = newData
+            end
         end
     end
 end
