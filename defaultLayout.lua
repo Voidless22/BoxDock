@@ -53,15 +53,16 @@ defaultLayout.Buffs = {
 }
 defaultLayout.Spellbar = {
     Enabled = true,
-    GemGap = 2,
+    GemGap = 12,
     Orientation = "Horizontal",
     Orientations = { Horizontal = {}, Vertical = {}, WndSpace = {}, Custom = {} },
-    StartingLoc = { x = (defaultLayout.Window.Size.w / 4), y = (defaultLayout.Window.Size.h) - 30 },
-    GemSize = 28,
+    StartingLoc = { x = 12, y = (defaultLayout.Window.Size.h - 48 )},
+    GemSize = 32,
     TotalWndSpace = { w = 156, h = 56 },
     WndSpaceStartLoc = { x = 128, y = 0 }
 
 }
+
 defaultLayout.Target = {
     Enabled = true,
     NameText = true,
@@ -76,113 +77,35 @@ defaultLayout.Target = {
         IconSize = 16
     }   
 }
+defaultLayout.Group = {
+    Enabled = true,
+    NameText = true,
+    Loc = {x = (defaultLayout.Window.Size.w / 5),  y=12},
+    WndSpace = { w=170, h=48},
+    Color = ImVec4(1,0,0,1), 
+    Size = {w=56,h=32}
+}
+defaultLayout.Hotbar = {
+    Enabled = true,
+    Loc = {x = (defaultLayout.Window.Size.w / 5), y = 78},
+    WndSpace = {w=360, h=160},
+    BtnSize = {w=32, h=32}
+}
 
-defaultLayout.Spellbar.Orientations.Horizontal = {
-    [1] = {
+defaultLayout.Spellbar.Orientations.Horizontal = {}
+defaultLayout.Spellbar.Orientations.Vertical = {}
+for i=1, 12 do
+    defaultLayout.Spellbar.Orientations.Horizontal[i] = {
         Enabled = true,
-        Loc = defaultLayout.Spellbar.StartingLoc
-    },
-    [2] = {
+        Loc = {x = defaultLayout.Spellbar.StartingLoc.x + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * i), y = defaultLayout.Spellbar.StartingLoc.y}
+    }
+end
+for i=1, 12 do
+    defaultLayout.Spellbar.Orientations.Vertical[i] = {
         Enabled = true,
-        Loc = { x = (defaultLayout.Spellbar.StartingLoc.x + defaultLayout.Spellbar.GemGap + defaultLayout.Spellbar.GemSize), y = defaultLayout.Spellbar.StartingLoc.y }
-    },
-    [3] = {
-        Enabled = true,
-        Loc = { x = (defaultLayout.Spellbar.StartingLoc.x + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 2)), y = defaultLayout.Spellbar.StartingLoc.y }
-    },
-    [4] = {
-        Enabled = true,
-        Loc = { x = (defaultLayout.Spellbar.StartingLoc.x + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 3)), y = defaultLayout.Spellbar.StartingLoc.y }
-    },
-    [5] = {
-        Enabled = true,
-        Loc = { x = (defaultLayout.Spellbar.StartingLoc.x + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 4)), y = defaultLayout.Spellbar.StartingLoc.y }
-    },
-    [6] = {
-        Enabled = true,
-        Loc = { x = (defaultLayout.Spellbar.StartingLoc.x + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 5)), y = defaultLayout.Spellbar.StartingLoc.y }
-    },
-    [7] = {
-        Enabled = true,
-        Loc = { x = (defaultLayout.Spellbar.StartingLoc.x + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 6)), y = defaultLayout.Spellbar.StartingLoc.y }
-    },
-    [8] = {
-        Enabled = true,
-        Loc = { x = (defaultLayout.Spellbar.StartingLoc.x + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 7)), y = defaultLayout.Spellbar.StartingLoc.y }
-    },
-    [9] = {
-        Enabled = true,
-        Loc = { x = (defaultLayout.Spellbar.StartingLoc.x + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 8)), y = defaultLayout.Spellbar.StartingLoc.y }
-    },
-    [10] = {
-        Enabled = true,
-        Loc = { x = (defaultLayout.Spellbar.StartingLoc.x + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 9)), y = defaultLayout.Spellbar.StartingLoc.y }
-    },
-    [11] = {
-        Enabled = true,
-        Loc = { x = (defaultLayout.Spellbar.StartingLoc.x + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 10)), y = defaultLayout.Spellbar.StartingLoc.y }
-    },
-    [12] = {
-        Enabled = true,
-        Loc = { x = (defaultLayout.Spellbar.StartingLoc.x + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 11)), y = defaultLayout.Spellbar.StartingLoc.y }
-    },
-    [13] = {
-        Enabled = true,
-        Loc = { x = (defaultLayout.Spellbar.StartingLoc.x + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 12)), y = defaultLayout.Spellbar.StartingLoc.y }
-    },
-}
-defaultLayout.Spellbar.Orientations.Vertical = {
-    [1] = {
-        Enabled = true,
-        Loc = defaultLayout.Spellbar.StartingLoc
-    },
-    [2] = {
-        Enabled = true,
-        Loc = { x = defaultLayout.Spellbar.StartingLoc.x, y = (defaultLayout.Spellbar.StartingLoc.y + defaultLayout.Spellbar.GemGap + defaultLayout.Spellbar.GemSize) }
-    },
-    [3] = {
-        Enabled = true,
-        Loc = { x = defaultLayout.Spellbar.StartingLoc.x, y = (defaultLayout.Spellbar.StartingLoc.y + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 2)) }
-    },
-    [4] = {
-        Enabled = true,
-        Loc = { x = defaultLayout.Spellbar.StartingLoc.x, y = (defaultLayout.Spellbar.StartingLoc.y + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 3)) }
-    },
-    [5] = {
-        Enabled = true,
-        Loc = { x = defaultLayout.Spellbar.StartingLoc.x, y = (defaultLayout.Spellbar.StartingLoc.y + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 4)) }
-    },
-    [6] = {
-        Enabled = true,
-        Loc = { x = defaultLayout.Spellbar.StartingLoc.x, y = (defaultLayout.Spellbar.StartingLoc.y + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 5)) }
-    },
-    [7] = {
-        Enabled = true,
-        Loc = { x = defaultLayout.Spellbar.StartingLoc.x, y = (defaultLayout.Spellbar.StartingLoc.y + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 6)) }
-    },
-    [8] = {
-        Enabled = true,
-        Loc = { x = defaultLayout.Spellbar.StartingLoc.x, y = (defaultLayout.Spellbar.StartingLoc.y + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 7)) }
-    },
-    [9] = {
-        Enabled = true,
-        Loc = { x = defaultLayout.Spellbar.StartingLoc.x, y = (defaultLayout.Spellbar.StartingLoc.y + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 8)) }
-    },
-    [10] = {
-        Enabled = true,
-        Loc = { x = defaultLayout.Spellbar.StartingLoc.x, y = (defaultLayout.Spellbar.StartingLoc.y + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 9)) }
-    },
-    [11] = {
-        Enabled = true,
-        Loc = { x = defaultLayout.Spellbar.StartingLoc.x, y = (defaultLayout.Spellbar.StartingLoc.y + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 10)) }
-    },
-    [12] = {
-        Enabled = true,
-        Loc = { x = defaultLayout.Spellbar.StartingLoc.x, y = (defaultLayout.Spellbar.StartingLoc.y + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 11)) }
-    },
-    [13] = {
-        Enabled = true,
-        Loc = { x = defaultLayout.Spellbar.StartingLoc.x, y = (defaultLayout.Spellbar.StartingLoc.y + defaultLayout.Spellbar.GemGap + (defaultLayout.Spellbar.GemSize * 12)) }
-    },
-}
+        Loc = {x = defaultLayout.Spellbar.StartingLoc.x, y = defaultLayout.Spellbar.StartingLoc.y + defaultLayout.Spellbar.GemGap  + (defaultLayout.Spellbar.GemSize * i) }
+    }
+end
+
+
 return defaultLayout

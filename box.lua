@@ -40,27 +40,44 @@ local function RefreshData()
         end
     end
     if data.Refresh(mq.TLO.Target.ConColor, dataTable.Target.ConColor) then
-        dataTable.Target.ConColor = mq.TLO.Target.ConColor() or 0 
+        dataTable.Target.ConColor = mq.TLO.Target.ConColor() or 0
         utils.boxActor:send(msgHandler.driverAddress,
-        { id = 'Data-Refresh', dataType = 'Target-ConColor', newData =   dataTable.Target.ConColor, boxName = boxName })
+            { id = 'Data-Refresh', dataType = 'Target-ConColor', newData = dataTable.Target.ConColor, boxName = boxName })
     end
     -- Target Buffs
     if dataTable.Target.Id ~= (0 or nil) and dataTable.Target.Buffs ~= nil then
-        for i = 0, (mq.TLO.Target.BuffCount() or 0) do
-            if data.Refresh(mq.TLO.Target.Buff(i).Spell.ID(), dataTable.Target.Buffs[i]) then
-                dataTable.Target.Buffs[i] = mq.TLO.Target.Buff(i).Spell.ID()
-                utils.boxActor:send(msgHandler.driverAddress,
-                    {
-                        id = 'Data-Refresh',
-                        dataType = 'Target Buff',
-                        subIndex = i,
-                        newData = mq.TLO.Target.Buff(i).ID(),
-                        boxName =
-                            boxName
-                    })
+        if mq.TLO.Target.BuffCount() ~= 0 then
+            for i = 1, (mq.TLO.Target.BuffCount()) do
+                if data.Refresh(mq.TLO.Target.Buff(i).Spell.ID(), dataTable.Target.Buffs[i]) then
+                    dataTable.Target.Buffs[i] = (mq.TLO.Target.Buff(i).Spell.ID() or 0)
+                    utils.boxActor:send(msgHandler.driverAddress,
+                        {
+                            id = 'Data-Refresh',
+                            dataType = 'Target Buff',
+                            subIndex = i,
+                            newData = dataTable.Target.Buffs[i],
+                            boxName = boxName
+                        })
+                end
+            end
+        elseif mq.TLO.Target.BuffCount() == 0 then
+            for i = 0, #dataTable.Target.Buffs do
+                if data.Refresh(0, dataTable.Target.Buffs[i]) then
+                    dataTable.Target.Buffs[i] = 0
+                    utils.boxActor:send(msgHandler.driverAddress,
+                        {
+                            id = 'Data-Refresh',
+                            dataType = 'Target Buff',
+                            subIndex = i,
+                            newData = 0,
+                            boxName = boxName
+                        })
+                end
             end
         end
     end
+
+
     -- Spellbar
     for i = 1, mq.TLO.Me.NumGems() do
         if data.Refresh((mq.TLO.Me.Gem(i).ID() or 0), dataTable.Spellbar[i]) then
@@ -77,16 +94,16 @@ local function RefreshData()
         end
     end
     -- Buffs
-    for i = 0, (mq.TLO.Me.BuffCount() or 0) do
-        if data.Refresh(mq.TLO.Me.Buff(i).Spell.ID(), dataTable.Buffs[i]) then
-            dataTable.Buffs[i] = mq.TLO.Me.Buff(i).Spell.ID()
-            mq.delay(10)
+    for i = 0, mq.TLO.Me.MaxBuffSlots() do
+        if data.Refresh((mq.TLO.Me.Buff(i).Spell.ID() or 0), dataTable.Buffs[i]) then
+            dataTable.Buffs[i] = (mq.TLO.Me.Buff(i).Spell.ID() or 0)
+            mq.delay(20)
             utils.boxActor:send(msgHandler.driverAddress,
                 {
                     id = 'Data-Refresh',
                     dataType = 'Buff',
                     subIndex = i,
-                    newData = mq.TLO.Me.Buff(i).Spell.ID(),
+                    newData = dataTable.Buffs[i],
                     boxName =
                         boxName
                 })

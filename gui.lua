@@ -74,6 +74,10 @@ local function DrawDock(charName)
     if charData.Target ~= nil then
         dockModules.Target(gui.Layout[charName], charData)
     end
+    if charData.Group ~= nil then
+        dockModules.Group(gui.Layout[charName], charData)
+    end
+    dockModules.Hotbar(gui.Layout[charName], charData)
 end
 
 local function DrawBDButton()

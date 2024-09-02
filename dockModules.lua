@@ -32,7 +32,6 @@ local function ConColorToImVec4(color)
 end
 
 function dockModules.Stats(layout, data)
-    -- HP Bar
     if not layout.Stats.Enabled then
         return
     else
@@ -41,18 +40,21 @@ function dockModules.Stats(layout, data)
             ImGui.SetCursorPos(layout.Stats.HP.Loc.x, layout.Stats.HP.Loc.y)
             ImGui.PushStyleColor(ImGuiCol.PlotHistogram, layout.Stats.HP.Color)
             ImGui.ProgressBar(hpRatio, ImVec2(layout.Stats.HP.Size.w, layout.Stats.HP.Size.h))
+            ImGui.PopStyleColor()
         end
         if layout.Stats.Mana.Enabled then
             local manaRatio = (data.Stats.Mana / 100) or 0
             ImGui.SetCursorPos(layout.Stats.Mana.Loc.x, layout.Stats.Mana.Loc.y)
             ImGui.PushStyleColor(ImGuiCol.PlotHistogram, layout.Stats.Mana.Color)
             ImGui.ProgressBar(manaRatio, ImVec2(layout.Stats.Mana.Size.w, layout.Stats.Mana.Size.h))
+            ImGui.PopStyleColor()
         end
         if layout.Stats.Endurance.Enabled then
             local endRatio = (data.Stats.End / 100) or 0
             ImGui.SetCursorPos(layout.Stats.Endurance.Loc.x, layout.Stats.Endurance.Loc.y)
             ImGui.PushStyleColor(ImGuiCol.PlotHistogram, layout.Stats.Endurance.Color)
             ImGui.ProgressBar(endRatio, ImVec2(layout.Stats.Endurance.Size.w, layout.Stats.Endurance.Size.h))
+            ImGui.PopStyleColor()
         end
     end
 end
@@ -138,16 +140,15 @@ function dockModules.Spellbar(layout, data)
     else
         local orientation = layout.Spellbar.Orientation
         if orientation == "Horizontal" or orientation == "Vertical" then
-            for i = 1, #data.Spellbar do
+            for i = 1, 12 do
                 local layoutData = layout.Spellbar.Orientations[orientation][i]
                 if layoutData.Enabled then
                     ImGui.SetCursorPos(layoutData.Loc.x, layoutData.Loc.y)
-                    -- if there's no spell
-                    if data.Spellbar[i] == 0 then
-                        ImGui.DrawTextureAnimation(gemBG, layoutData.Size, layoutData.Size)
-                    else
+                    if data.Spellbar[i] ~= 0 and data.Spellbar[i] ~= nil then
                         animSpellIcons:SetTextureCell(mq.TLO.Spell(data.Spellbar[i]).SpellIcon())
                         ImGui.DrawTextureAnimation(animSpellIcons, layout.Spellbar.GemSize, layout.Spellbar.GemSize)
+                    else
+                        ImGui.DrawTextureAnimation(gemBG, layout.Spellbar.GemSize, layout.Spellbar.GemSize)
                     end
                 end
             end
@@ -202,7 +203,7 @@ function dockModules.Target(layout, data)
             ImGui.ProgressBar(hpRatio,
                 ImVec2(layout.Target.Size.w,
                     layout.Target.Size.h))
-            
+
             if layout.Target.Buffs.Enabled then
                 ImGui.SetCursorPos(layout.Target.Buffs.Loc.x, layout.Target.Buffs.Loc.y)
                 local buffSpace = { w = layout.Target.Buffs.WndSpace.w, h = layout.Target.Buffs.WndSpace.h }
@@ -210,29 +211,124 @@ function dockModules.Target(layout, data)
                 local currentColumn = 1
                 local currentRow = 1
                 ImGui.SetCursorPos(layout.Target.Buffs.Loc.x, layout.Target.Buffs.Loc.y)
-                for index, value in ipairs(data.Target.Buffs) do
-                    if value ~= 0 then
-                        animSpellIcons:SetTextureCell(mq.TLO.Spell(value).SpellIcon())
-                        if currentColumn < columnCount then
-                            local prevX = ImGui.GetCursorPosX()
-                            local prevY = ImGui.GetCursorPosY()
-                            ImGui.DrawTextureAnimation(animSpellIcons, layout.Target.Buffs.IconSize, layout.Target.Buffs.IconSize)
-                            ImGui.SetCursorPosX(prevX + layout.Target.Buffs.IconSize)
-                            ImGui.SetCursorPosY(prevY)
-                            currentColumn = currentColumn + 1
-                        elseif currentColumn >= columnCount then
-                            local prevY = ImGui.GetCursorPosY()
-                            ImGui.DrawTextureAnimation(animSpellIcons, layout.Target.Buffs.IconSize, layout.Target.Buffs.IconSize)
-                            ImGui.SetCursorPosX(layout.Target.Buffs.Loc.x)
-                            ImGui.SetCursorPosY(prevY + layout.Target.Buffs.IconSize)
-                            currentRow = currentRow + 1
-                            currentColumn = 1
+                if data.Target.Buffs ~= nil then
+                    for index, value in ipairs(data.Target.Buffs) do
+                        if value ~= 0 then
+                            animSpellIcons:SetTextureCell(mq.TLO.Spell(value).SpellIcon())
+                            if currentColumn < columnCount then
+                                local prevX = ImGui.GetCursorPosX()
+                                local prevY = ImGui.GetCursorPosY()
+                                ImGui.DrawTextureAnimation(animSpellIcons, layout.Target.Buffs.IconSize,
+                                    layout.Target.Buffs.IconSize)
+                                ImGui.SetCursorPosX(prevX + layout.Target.Buffs.IconSize)
+                                ImGui.SetCursorPosY(prevY)
+                                currentColumn = currentColumn + 1
+                            elseif currentColumn >= columnCount then
+                                local prevY = ImGui.GetCursorPosY()
+                                ImGui.DrawTextureAnimation(animSpellIcons, layout.Target.Buffs.IconSize,
+                                    layout.Target.Buffs.IconSize)
+                                ImGui.SetCursorPosX(layout.Target.Buffs.Loc.x)
+                                ImGui.SetCursorPosY(prevY + layout.Target.Buffs.IconSize)
+                                currentRow = currentRow + 1
+                                currentColumn = 1
+                            end
                         end
                     end
                 end
             end
         end
+    end
+end
 
+local grpMemberTxtSize = ImVec2(0, 0)
+local function memberModule(layout, data)
+    local cursorPos = ImGui.GetCursorPosVec()
+    local hpRatio = mq.TLO.Spawn(data.Id).PctHPs() / 100
+    if grpMemberTxtSize.x < ImGui.CalcTextSizeVec(data.Name).x then
+        grpMemberTxtSize = ImGui.CalcTextSizeVec(data.Name)
+    end
+    if layout.Group.NameText then
+        ImGui.Text(data.Name)
+    end
+    ImGui.SetCursorPos(cursorPos.x, (cursorPos.y + grpMemberTxtSize.y))
+    ImGui.PushStyleColor(ImGuiCol.PlotHistogram, layout.Group.Color)
+    ImGui.ProgressBar(hpRatio, grpMemberTxtSize.x, (layout.Group.Size.h / 2))
+    ImGui.PopStyleColor()
+end
+
+local function hotbuttonModule(layout, data)
+
+end
+function dockModules.Hotbar(layout, data)
+    local buttons = {}
+    local buttonGap = 8
+    local buttonSpace = { w = layout.Hotbar.WndSpace.w, h = layout.Hotbar.WndSpace.h }
+    local totalbuttonSize = { w = layout.Hotbar.BtnSize.w + buttonGap, h = layout.Hotbar.BtnSize.h + buttonGap }
+    local columnCount = math.floor(buttonSpace.w / totalbuttonSize.w)
+    local rowCount = math.floor(buttonSpace.h / totalbuttonSize.h)
+    local totalButtonCount = columnCount * rowCount
+    local currentColumn = 1
+    local currentRow = 1
+    ImGui.SetCursorPos(layout.Hotbar.Loc.x, layout.Hotbar.Loc.y)
+
+    for i = 1, totalButtonCount do
+        if currentColumn < columnCount then
+            local prevX = ImGui.GetCursorPosX()
+            local prevY = ImGui.GetCursorPosY()
+            --hbModule(layout, value)
+            buttons[i] = ImGui.Button(tostring(i),ImVec2(layout.Hotbar.BtnSize.w, layout.Hotbar.BtnSize.h))
+            ImGui.SetCursorPosX(prevX + layout.Hotbar.BtnSize.w)
+            ImGui.SetCursorPosY(prevY)
+            currentColumn = currentColumn + 1
+        elseif currentColumn >= columnCount then
+            local prevY = ImGui.GetCursorPosY()
+            local prevX = ImGui.GetCursorPosX()
+            --hbModule(layout, value)
+            buttons[i] = ImGui.Button(tostring(i),ImVec2(layout.Hotbar.BtnSize.w, layout.Hotbar.BtnSize.h))
+            ImGui.SetCursorPosX(layout.Hotbar.Loc.x)
+            ImGui.SetCursorPosY(prevY + layout.Hotbar.BtnSize.h)
+            currentRow = currentRow + 1
+            currentColumn = 1
+        end
+    end
+end
+
+function dockModules.Group(layout, data)
+    if not layout.Group.Enabled then
+        return
+    else
+        ImGui.SetCursorPos(layout.Group.Loc.x, layout.Group.Loc.y)
+        local groupSpace = { w = layout.Group.WndSpace.w, h = layout.Group.WndSpace.h }
+        local columnCount = math.floor(groupSpace.w / layout.Group.Size.w)
+        local currentColumn = 1
+        local currentRow = 1
+        local largestText = 0
+        for index, value in pairs(data.Group) do
+            if largestText < ImGui.CalcTextSizeVec(value.Name).x then
+                largestText = ImGui.CalcTextSizeVec(value.Name).x
+            end
+        end
+        for index, value in pairs(data.Group) do
+            if value ~= 0 then
+                if currentColumn < columnCount then
+                    local prevX = ImGui.GetCursorPosX()
+                    local prevY = ImGui.GetCursorPosY()
+                    memberModule(layout, value)
+
+                    ImGui.SetCursorPosX(prevX + largestText + 8)
+                    ImGui.SetCursorPosY(prevY)
+                    currentColumn = currentColumn + 1
+                elseif currentColumn >= columnCount then
+                    local prevY = ImGui.GetCursorPosY()
+                    local prevX = ImGui.GetCursorPosX()
+                    memberModule(layout, value)
+                    ImGui.SetCursorPosX(layout.Group.Loc.x)
+                    ImGui.SetCursorPosY(prevY + layout.Group.Size.h)
+                    currentRow = currentRow + 1
+                    currentColumn = 1
+                end
+            end
+        end
     end
 end
 
